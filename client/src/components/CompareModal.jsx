@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { X, Check, AlertCircle, Scale, BookOpen, Layers } from "lucide-react";
 import { ProviderDot, TypeBadge } from "./ModelCard.jsx";
 import { Term, isJargon } from "../glossary.jsx";
+import { BENCH_DEFS } from "./BenchmarkBars.jsx";
+import RadarChart, { RADAR_COLORS } from "./RadarChart.jsx";
 
 export default function CompareModal({ models, level: initialLevel = "beginner", onClose }) {
   const [level, setLevel] = useState(initialLevel);
@@ -128,6 +130,65 @@ export default function CompareModal({ models, level: initialLevel = "beginner",
                     </div>
                   </div>
                 ))}
+              </div>
+            </>
+          )}
+
+          {/* Expert-only: benchmark radar chart */}
+          {level === "expert" && models.some((m) => m.benchmarks) && (
+            <>
+              <div className="ffg-cmp-section">Benchmark scores</div>
+              <div className="ffg-cmp-radar-wrap">
+                <RadarChart models={models} />
+                <div className="ffg-cmp-radar-right">
+                  {/* Color legend */}
+                  <div className="ffg-cmp-radar-legend">
+                    {models.map((m, i) => (
+                      <div key={m.id} className="ffg-cmp-radar-legend-item">
+                        <span
+                          className="ffg-cmp-radar-dot"
+                          style={{ background: RADAR_COLORS[i % RADAR_COLORS.length] }}
+                        />
+                        <span className="ffg-cmp-radar-legend-name">{m.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* Exact score table */}
+                  <div className="ffg-cmp-radar-scores">
+                    {/* Dot header */}
+                    <div className="ffg-cmp-radar-score-row ffg-cmp-radar-score-head">
+                      <span className="ffg-cmp-radar-score-label" />
+                      {models.map((m, i) => (
+                        <span key={m.id} className="ffg-cmp-radar-score-val">
+                          <span
+                            className="ffg-cmp-radar-dot"
+                            style={{ background: RADAR_COLORS[i % RADAR_COLORS.length] }}
+                          />
+                        </span>
+                      ))}
+                    </div>
+                    {BENCH_DEFS.map(({ key, label }) => (
+                      <div key={key} className="ffg-cmp-radar-score-row">
+                        <span className="ffg-cmp-radar-score-label">{label}</span>
+                        {models.map((m, i) => {
+                          const score = m.benchmarks?.[key];
+                          return (
+                            <span
+                              key={m.id}
+                              className="ffg-cmp-radar-score-val"
+                              style={{ color: RADAR_COLORS[i % RADAR_COLORS.length] }}
+                            >
+                              {score ?? "—"}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="ffg-cmp-radar-note">
+                    Percentile estimates based on published benchmarks.
+                  </p>
+                </div>
               </div>
             </>
           )}

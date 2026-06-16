@@ -1,20 +1,26 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Search, Sparkles, X, BookOpen, Layers, Moon, Sun, ArrowRight } from "lucide-react";
+import { Search, Sparkles, X, BookOpen, Layers, Moon, Sun, ArrowRight, Calculator } from "lucide-react";
 import { useCatalog } from "./useCatalog.js";
+import { usePricing } from "./usePricing.js";
+import { colorFor } from "./providers.js";
 import { USE_CASES } from "./constants.js";
 import ModelCard from "./components/ModelCard.jsx";
 import DetailModal from "./components/DetailModal.jsx";
 import CompareBar from "./components/CompareBar.jsx";
 import CompareModal from "./components/CompareModal.jsx";
 import QuizModal from "./components/QuizModal.jsx";
+import CostModal from "./components/CostModal.jsx";
 
 export default function App() {
   const { models, loading, error } = useCatalog();
+  const pricing = usePricing(models);
 
   const [level, setLevel] = useState("beginner");
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [useFilter, setUseFilter] = useState("All uses");
+  const [providerFilter, setProviderFilter] = useState(new Set());
+  const [sortBy, setSortBy] = useState("default");
   const [selected, setSelected] = useState(null);
 
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("ffg-dark") === "true");
@@ -39,6 +45,8 @@ export default function App() {
     document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
     localStorage.setItem("ffg-dark", darkMode);
   }, [darkMode]);
+
+  const [costOpen, setCostOpen] = useState(false);
 
   const [compareSet, setCompareSet] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -69,16 +77,25 @@ export default function App() {
     });
   }
 
-  const providers = useMemo(
-    () => new Set(models.map((m) => m.provider)).size,
+  const allProviders = useMemo(
+    () => [...new Set(models.map((m) => m.provider))],
     [models]
   );
 
+  function toggleProvider(name) {
+    setProviderFilter((prev) => {
+      const next = new Set(prev);
+      next.has(name) ? next.delete(name) : next.add(name);
+      return next;
+    });
+  }
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return models.filter((m) => {
+    const list = models.filter((m) => {
       if (typeFilter !== "all" && m.type !== typeFilter) return false;
       if (useFilter !== "All uses" && !(m.uses || []).includes(useFilter)) return false;
+      if (providerFilter.size > 0 && !providerFilter.has(m.provider)) return false;
       if (
         q &&
         !(
@@ -91,7 +108,11 @@ export default function App() {
         return false;
       return true;
     });
-  }, [models, query, typeFilter, useFilter]);
+    if (sortBy !== "default") {
+      list.sort((a, b) => (b.benchmarks?.[sortBy] ?? 0) - (a.benchmarks?.[sortBy] ?? 0));
+    }
+    return list;
+  }, [models, query, typeFilter, useFilter, providerFilter, sortBy]);
 
   return (
     <div className="ffg-root">
@@ -146,13 +167,19 @@ export default function App() {
             ? "New to all this? Each model is described in plain English — what it is, and what it's actually good for. Flip to Expert any time for the specs."
             : "Specs-first view: context windows, parameters, licenses, and access. Flip to Beginner for plain-language summaries."}
         </p>
-        <button className="ffg-quiz-entry-btn" onClick={() => setQuizOpen(true)}>
-          <Sparkles size={13} />
-          Not sure which model to pick?
-          <ArrowRight size={13} />
-        </button>
+        <div className="ffg-hero-actions">
+          <button className="ffg-quiz-entry-btn" onClick={() => setQuizOpen(true)}>
+            <Sparkles size={13} />
+            Not sure which model to pick?
+            <ArrowRight size={13} />
+          </button>
+          <button className="ffg-calc-entry-btn" onClick={() => setCostOpen(true)}>
+            <Calculator size={13} />
+            Estimate costs
+          </button>
+        </div>
         <p className="ffg-count">
-          <strong>{models.length}</strong> models · <strong>{providers}</strong> providers
+          <strong>{models.length}</strong> models · <strong>{allProviders.length}</strong> providers
         </p>
       </section>
 
@@ -197,6 +224,46 @@ export default function App() {
           <option>All uses</option>
           {USE_CASES.map((u) => <option key={u}>{u}</option>)}
         </select>
+
+        <select
+          className="ffg-select"
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          aria-label="Sort by benchmark"
+        >
+          <option value="default">Sort: default</option>
+          <option value="coding">Sort: Coding</option>
+          <option value="math">Sort: Math &amp; logic</option>
+          <option value="reasoning">Sort: Science reasoning</option>
+          <option value="knowledge">Sort: General knowledge</option>
+        </select>
+
+        <div className="ffg-prov-chips">
+          {allProviders.map((p) => {
+            const on = providerFilter.has(p);
+            const color = colorFor(p);
+            return (
+              <button
+                key={p}
+                className={`ffg-prov-chip${on ? " on" : ""}`}
+                onClick={() => toggleProvider(p)}
+                style={on ? { borderColor: color, color } : {}}
+                aria-pressed={on}
+              >
+                <span className="ffg-dot" style={{ background: color }} />
+                {p}
+              </button>
+            );
+          })}
+          {providerFilter.size > 0 && (
+            <button
+              className="ffg-prov-clear"
+              onClick={() => setProviderFilter(new Set())}
+            >
+              <X size={11} /> Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -211,6 +278,8 @@ export default function App() {
               setQuery("");
               setTypeFilter("all");
               setUseFilter("All uses");
+              setProviderFilter(new Set());
+              setSortBy("default");
             }}
           >
             Reset filters
@@ -243,6 +312,14 @@ export default function App() {
           plain-English definition.
         </p>
       </footer>
+
+      {costOpen && (
+        <CostModal
+          models={models}
+          pricing={pricing}
+          onClose={() => setCostOpen(false)}
+        />
+      )}
 
       {selected && (
         <DetailModal

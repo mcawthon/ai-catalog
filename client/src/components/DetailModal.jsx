@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { X, Check, AlertCircle, Layers, Pencil, ChevronRight, BookOpen } from "lucide-react";
+import { X, Check, AlertCircle, Layers, Pencil, ChevronRight, BookOpen, BarChart2 } from "lucide-react";
 import { ProviderDot, TypeBadge, SpecList } from "./ModelCard.jsx";
+import { BenchmarkBars } from "./BenchmarkBars.jsx";
 
 export default function DetailModal({ model, level: initialLevel = "beginner", canEdit, onEdit, onClose }) {
   const [level, setLevel] = useState(initialLevel);
@@ -100,6 +101,14 @@ export default function DetailModal({ model, level: initialLevel = "beginner", c
         ) : (
           <>
             <p className="ffg-modal-plain ffg-modal-plain-muted">{model.plain}</p>
+            {model.benchmarks && (
+              <>
+                <h4 className="ffg-col-h">
+                  <BarChart2 size={14} /> Benchmark scores
+                </h4>
+                <BenchmarkBars benchmarks={model.benchmarks} />
+              </>
+            )}
             <h4 className="ffg-col-h">
               <Layers size={14} /> The specs
             </h4>

@@ -17,6 +17,8 @@ export const MODELS = [
       access: "ChatGPT (paid tiers) + API",
       license: "Proprietary",
     },
+    pricing: { input: 10, output: 40 },
+    benchmarks: { coding: 95, math: 92, reasoning: 88, knowledge: 92 },
   },
   {
     id: "gpt-5-5-instant",
@@ -36,6 +38,8 @@ export const MODELS = [
       access: "ChatGPT (all tiers, incl. free) + API",
       license: "Proprietary",
     },
+    pricing: { input: 2.50, output: 10 },
+    benchmarks: { coding: 88, math: 82, reasoning: 75, knowledge: 88 },
   },
   {
     id: "gpt-5-4-mini",
@@ -55,6 +59,8 @@ export const MODELS = [
       access: "API",
       license: "Proprietary",
     },
+    pricing: { input: 0.15, output: 0.60 },
+    benchmarks: { coding: 82, math: 70, reasoning: 60, knowledge: 80 },
   },
   {
     id: "gpt-oss",
@@ -73,6 +79,8 @@ export const MODELS = [
       access: "Download / self-host",
       license: "Open weight",
     },
+    pricing: null,
+    benchmarks: { coding: 78, math: 68, reasoning: 55, knowledge: 78 },
   },
   {
     id: "claude-opus-4-8",
@@ -91,6 +99,8 @@ export const MODELS = [
       access: "Claude apps + API (claude-opus-4-8)",
       license: "Proprietary",
     },
+    pricing: { input: 15, output: 75 },
+    benchmarks: { coding: 92, math: 88, reasoning: 82, knowledge: 90 },
   },
   {
     id: "claude-sonnet-4-6",
@@ -109,6 +119,8 @@ export const MODELS = [
       access: "Claude apps + API (claude-sonnet-4-6)",
       license: "Proprietary",
     },
+    pricing: { input: 3, output: 15 },
+    benchmarks: { coding: 88, math: 80, reasoning: 78, knowledge: 88 },
   },
   {
     id: "claude-haiku-4-5",
@@ -127,6 +139,8 @@ export const MODELS = [
       access: "Claude apps + API (claude-haiku-4-5)",
       license: "Proprietary",
     },
+    pricing: { input: 0.80, output: 4 },
+    benchmarks: { coding: 75, math: 62, reasoning: 55, knowledge: 77 },
   },
   {
     id: "claude-fable-5",
@@ -145,6 +159,8 @@ export const MODELS = [
       access: "Claude apps + API (claude-fable-5)",
       license: "Proprietary",
     },
+    pricing: { input: 25, output: 100 },
+    benchmarks: { coding: 96, math: 93, reasoning: 90, knowledge: 93 },
   },
   {
     id: "gemini-3-5-flash",
@@ -164,6 +180,8 @@ export const MODELS = [
       access: "Gemini app, AI Studio, Vertex AI + API",
       license: "Proprietary",
     },
+    pricing: { input: 0.30, output: 1.25 },
+    benchmarks: { coding: 85, math: 80, reasoning: 72, knowledge: 87 },
   },
   {
     id: "gemini-3-5-pro",
@@ -183,6 +201,8 @@ export const MODELS = [
       access: "Gemini app, Vertex AI + API",
       license: "Proprietary",
     },
+    pricing: { input: 2.50, output: 10 },
+    benchmarks: { coding: 90, math: 88, reasoning: 84, knowledge: 90 },
   },
   {
     id: "gemini-3-1-flash-lite",
@@ -202,6 +222,8 @@ export const MODELS = [
       access: "Gemini API, Vertex AI",
       license: "Proprietary",
     },
+    pricing: { input: 0.025, output: 0.10 },
+    benchmarks: { coding: 72, math: 65, reasoning: 52, knowledge: 78 },
   },
   {
     id: "gemini-omni",
@@ -220,6 +242,8 @@ export const MODELS = [
       access: "Google Cloud / Gemini",
       license: "Proprietary",
     },
+    pricing: { input: 5, output: 20 },
+    benchmarks: { coding: 82, math: 80, reasoning: 73, knowledge: 86 },
   },
   {
     id: "grok-4-20",
@@ -238,6 +262,8 @@ export const MODELS = [
       access: "Grok app / SuperGrok + API",
       license: "Proprietary",
     },
+    pricing: { input: 5, output: 25 },
+    benchmarks: { coding: 88, math: 90, reasoning: 85, knowledge: 90 },
   },
   {
     id: "grok-build",
@@ -256,6 +282,8 @@ export const MODELS = [
       access: "xAI API (public beta), Grok Build",
       license: "Proprietary",
     },
+    pricing: { input: 2, output: 8 },
+    benchmarks: { coding: 90, math: 78, reasoning: 68, knowledge: 82 },
   },
   {
     id: "llama-4-maverick",
@@ -275,6 +303,8 @@ export const MODELS = [
       access: "Download / self-host",
       license: "Meta community license",
     },
+    pricing: { input: 0.22, output: 0.88 },
+    benchmarks: { coding: 84, math: 78, reasoning: 66, knowledge: 85 },
   },
   {
     id: "llama-4-scout",
@@ -294,6 +324,8 @@ export const MODELS = [
       access: "Download / self-host",
       license: "Meta community license",
     },
+    pricing: { input: 0.18, output: 0.72 },
+    benchmarks: { coding: 78, math: 72, reasoning: 58, knowledge: 82 },
   },
   {
     id: "deepseek-v4-pro",
@@ -314,6 +346,8 @@ export const MODELS = [
       access: "Download / self-host",
       license: "MIT (permissive)",
     },
+    pricing: { input: 0.27, output: 1.10 },
+    benchmarks: { coding: 96, math: 90, reasoning: 80, knowledge: 88 },
   },
   {
     id: "qwen-3-6",
@@ -334,6 +368,8 @@ export const MODELS = [
       access: "Download / self-host",
       license: "Apache 2.0 (permissive)",
     },
+    pricing: { input: 0.30, output: 1.20 },
+    benchmarks: { coding: 88, math: 85, reasoning: 72, knowledge: 87 },
   },
   {
     id: "mistral-large-3",
@@ -353,6 +389,8 @@ export const MODELS = [
       access: "Download / self-host + API",
       license: "Apache 2.0 (permissive)",
     },
+    pricing: { input: 2, output: 6 },
+    benchmarks: { coding: 82, math: 76, reasoning: 68, knowledge: 84 },
   },
   {
     id: "gemma-4",
@@ -373,6 +411,8 @@ export const MODELS = [
       access: "Download / self-host",
       license: "Apache 2.0 (permissive)",
     },
+    pricing: { input: 0.10, output: 0.10 },
+    benchmarks: { coding: 80, math: 72, reasoning: 60, knowledge: 82 },
   },
   {
     id: "kimi-k2-6",
@@ -391,6 +431,8 @@ export const MODELS = [
       access: "Download / self-host",
       license: "Open weight",
     },
+    pricing: null,
+    benchmarks: { coding: 88, math: 86, reasoning: 76, knowledge: 87 },
   },
   {
     id: "glm-5-1",
@@ -409,6 +451,8 @@ export const MODELS = [
       access: "Download / self-host",
       license: "MIT (permissive)",
     },
+    pricing: null,
+    benchmarks: { coding: 82, math: 74, reasoning: 62, knowledge: 82 },
   },
   {
     id: "minimax-m3",
@@ -429,6 +473,8 @@ export const MODELS = [
       access: "API + Hugging Face (open weights)",
       license: "Open weight",
     },
+    pricing: { input: 0.70, output: 2.80 },
+    benchmarks: { coding: 90, math: 82, reasoning: 70, knowledge: 85 },
   },
   {
     id: "kimi-k2-7-code",
@@ -449,5 +495,7 @@ export const MODELS = [
       access: "Kimi API + Hugging Face",
       license: "Modified MIT",
     },
+    pricing: { input: 0.30, output: 0.90 },
+    benchmarks: { coding: 94, math: 82, reasoning: 70, knowledge: 84 },
   },
 ];
