@@ -1,0 +1,12 @@
+{
+  "name": "ai-catalog",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace client",
+    "build": "npm run build --workspace client"
+  }
+}
