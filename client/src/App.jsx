@@ -1,9 +1,12 @@
-import React, { useMemo, useState } from "react";
-import { Search, Sparkles, X, BookOpen, Layers } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Search, Sparkles, X, BookOpen, Layers, Moon, Sun, ArrowRight } from "lucide-react";
 import { useCatalog } from "./useCatalog.js";
 import { USE_CASES } from "./constants.js";
 import ModelCard from "./components/ModelCard.jsx";
 import DetailModal from "./components/DetailModal.jsx";
+import CompareBar from "./components/CompareBar.jsx";
+import CompareModal from "./components/CompareModal.jsx";
+import QuizModal from "./components/QuizModal.jsx";
 
 export default function App() {
   const { models, loading, error } = useCatalog();
@@ -13,6 +16,58 @@ export default function App() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [useFilter, setUseFilter] = useState("All uses");
   const [selected, setSelected] = useState(null);
+
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("ffg-dark") === "true");
+
+  const [quizOpen, setQuizOpen] = useState(() =>
+    new URLSearchParams(window.location.search).has("quiz")
+  );
+  const [quizInitial] = useState(() => {
+    const raw = new URLSearchParams(window.location.search).get("quiz") || "";
+    const [useCase, access, priority] = raw.split(",");
+    return useCase && access && priority ? { useCase, access, priority } : null;
+  });
+
+  function closeQuiz() {
+    setQuizOpen(false);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("quiz");
+    window.history.replaceState({}, "", url.toString());
+  }
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
+    localStorage.setItem("ffg-dark", darkMode);
+  }, [darkMode]);
+
+  const [compareSet, setCompareSet] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("compare") || "";
+    return new Set(raw.split(",").filter(Boolean));
+  });
+  const [compareOpen, setCompareOpen] = useState(false);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (compareSet.size > 0) {
+      url.searchParams.set("compare", [...compareSet].join(","));
+    } else {
+      url.searchParams.delete("compare");
+    }
+    window.history.replaceState({}, "", url.toString());
+  }, [compareSet]);
+
+  function toggleCompare(id) {
+    setCompareSet((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else if (next.size < 3) {
+        next.add(id);
+      }
+      return next;
+    });
+  }
 
   const providers = useMemo(
     () => new Set(models.map((m) => m.provider)).size,
@@ -47,6 +102,13 @@ export default function App() {
         </div>
 
         <div className="ffg-header-right">
+          <button
+            className="ffg-theme-btn"
+            onClick={() => setDarkMode((d) => !d)}
+            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {darkMode ? <Sun size={15} /> : <Moon size={15} />}
+          </button>
           <div className="ffg-toggle" role="tablist" aria-label="Knowledge level">
             <span
               className="ffg-toggle-slider"
@@ -84,6 +146,11 @@ export default function App() {
             ? "New to all this? Each model is described in plain English — what it is, and what it's actually good for. Flip to Expert any time for the specs."
             : "Specs-first view: context windows, parameters, licenses, and access. Flip to Beginner for plain-language summaries."}
         </p>
+        <button className="ffg-quiz-entry-btn" onClick={() => setQuizOpen(true)}>
+          <Sparkles size={13} />
+          Not sure which model to pick?
+          <ArrowRight size={13} />
+        </button>
         <p className="ffg-count">
           <strong>{models.length}</strong> models · <strong>{providers}</strong> providers
         </p>
@@ -158,6 +225,8 @@ export default function App() {
               level={level}
               flash={false}
               onOpen={setSelected}
+              inCompare={compareSet.has(m.id)}
+              onToggleCompare={toggleCompare}
             />
           ))}
         </div>
@@ -178,7 +247,34 @@ export default function App() {
       {selected && (
         <DetailModal
           model={selected}
+          level={level}
           onClose={() => setSelected(null)}
+        />
+      )}
+
+      {quizOpen && (
+        <QuizModal
+          models={models}
+          initialAnswers={quizInitial}
+          onClose={closeQuiz}
+        />
+      )}
+
+      {compareSet.size > 0 && (
+        <CompareBar
+          models={models}
+          compareSet={compareSet}
+          onToggle={toggleCompare}
+          onOpen={() => setCompareOpen(true)}
+          onClear={() => setCompareSet(new Set())}
+        />
+      )}
+
+      {compareOpen && compareSet.size >= 2 && (
+        <CompareModal
+          models={models.filter((m) => compareSet.has(m.id))}
+          level={level}
+          onClose={() => setCompareOpen(false)}
         />
       )}
     </div>

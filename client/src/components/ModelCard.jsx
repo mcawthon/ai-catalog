@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChevronRight, ArrowRight, Lock, Unlock } from "lucide-react";
+import { ChevronRight, ArrowRight, Lock, Unlock, Scale, Check } from "lucide-react";
 import { Term, isJargon } from "../glossary.jsx";
 import { colorFor } from "../providers.js";
 
@@ -38,7 +38,7 @@ export function SpecList({ specs, expert }) {
   );
 }
 
-export default function ModelCard({ model, level, flash, onOpen }) {
+export default function ModelCard({ model, level, flash, onOpen, inCompare, onToggleCompare }) {
   const [showSpecs, setShowSpecs] = useState(false);
   return (
     <article
@@ -81,6 +81,17 @@ export default function ModelCard({ model, level, flash, onOpen }) {
 
       <div className="ffg-card-foot">
         <span className="ffg-released">{model.released || "—"}</span>
+        {onToggleCompare && (
+          <button
+            className={`ffg-cmp-toggle ${inCompare ? "on" : ""}`}
+            onClick={(e) => { e.stopPropagation(); onToggleCompare(model.id); }}
+            aria-label={inCompare ? "Remove from comparison" : "Add to comparison"}
+            aria-pressed={inCompare}
+          >
+            {inCompare ? <Check size={11} /> : <Scale size={11} />}
+            {inCompare ? "Added" : "Compare"}
+          </button>
+        )}
         <span className="ffg-more">
           Details <ArrowRight size={13} />
         </span>
