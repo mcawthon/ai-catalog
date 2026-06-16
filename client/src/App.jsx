@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Search, Sparkles, X, BookOpen, Layers, Moon, Sun, ArrowRight, Calculator } from "lucide-react";
+import { Search, Sparkles, X, BookOpen, Layers, Moon, Sun, ArrowRight, Calculator, Clock, Map } from "lucide-react";
 import { useCatalog } from "./useCatalog.js";
 import { usePricing } from "./usePricing.js";
 import { colorFor } from "./providers.js";
@@ -10,6 +10,8 @@ import CompareBar from "./components/CompareBar.jsx";
 import CompareModal from "./components/CompareModal.jsx";
 import QuizModal from "./components/QuizModal.jsx";
 import CostModal from "./components/CostModal.jsx";
+import TimelineView from "./components/TimelineView.jsx";
+import ScatterPlot from "./components/ScatterPlot.jsx";
 
 export default function App() {
   const { models, loading, error } = useCatalog();
@@ -46,7 +48,9 @@ export default function App() {
     localStorage.setItem("ffg-dark", darkMode);
   }, [darkMode]);
 
-  const [costOpen, setCostOpen] = useState(false);
+  const [costOpen, setCostOpen]       = useState(false);
+  const [scatterOpen, setScatterOpen] = useState(false);
+  const [view, setView]               = useState("grid"); // "grid" | "timeline"
 
   const [compareSet, setCompareSet] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -177,6 +181,10 @@ export default function App() {
             <Calculator size={13} />
             Estimate costs
           </button>
+          <button className="ffg-calc-entry-btn" onClick={() => setScatterOpen(true)}>
+            <Map size={13} />
+            Value map
+          </button>
         </div>
         <p className="ffg-count">
           <strong>{models.length}</strong> models · <strong>{allProviders.length}</strong> providers
@@ -266,10 +274,28 @@ export default function App() {
         </div>
       </div>
 
+      {/* View toggle */}
+      <div className="ffg-view-toggle">
+        <button
+          className={`ffg-view-btn${view === "grid" ? " on" : ""}`}
+          onClick={() => setView("grid")}
+        >
+          Grid
+        </button>
+        <button
+          className={`ffg-view-btn${view === "timeline" ? " on" : ""}`}
+          onClick={() => setView("timeline")}
+        >
+          <Clock size={12} /> Timeline
+        </button>
+      </div>
+
       {loading ? (
         <div className="ffg-empty"><p>Loading the catalog…</p></div>
       ) : error ? (
         <div className="ffg-empty"><p>Couldn't load the catalog.</p></div>
+      ) : view === "timeline" ? (
+        <TimelineView models={models} onOpen={setSelected} />
       ) : filtered.length === 0 ? (
         <div className="ffg-empty">
           <p>No models match those filters.</p>
@@ -318,6 +344,14 @@ export default function App() {
           models={models}
           pricing={pricing}
           onClose={() => setCostOpen(false)}
+        />
+      )}
+
+      {scatterOpen && (
+        <ScatterPlot
+          models={models}
+          onOpen={setSelected}
+          onClose={() => setScatterOpen(false)}
         />
       )}
 
